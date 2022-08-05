@@ -36,7 +36,10 @@ public class StateStoreGrpcComponentImpl extends StateStoreGrpc.StateStoreImplBa
       .setEtag(EMPTY_ETAG)
       .build();
 
-  public static final String KEY_DOES_NOT_EXIST = "KeyDoesNotExist";
+  static class BulkGetError {
+    public static final String KEY_DOES_NOT_EXIST = "KeyDoesNotExist";
+    public static final String NONE = "none";
+  }
 
   /**
    * The state store that this component will expose as a service.
@@ -114,7 +117,7 @@ public class StateStoreGrpcComponentImpl extends StateStoreGrpc.StateStoreImplBa
                 .setKey(requestedItem.getKey())
                 .setData(ByteString.copyFrom(value.getData()))
                 .setEtag(Etag.newBuilder().setValue(value.getEtag()).build())
-                .setError(KEY_DOES_NOT_EXIST)
+                .setError(BulkGetError.NONE)
                 .build()
             )
             // otherwise return an empty BulkStateItem with corresponding error codes
@@ -122,7 +125,7 @@ public class StateStoreGrpcComponentImpl extends StateStoreGrpc.StateStoreImplBa
                 .setKey(requestedItem.getKey())
                 .setData(ByteString.EMPTY)
                 .setEtag(EMPTY_ETAG)
-                .setError(KEY_DOES_NOT_EXIST)
+                .setError(BulkGetError.KEY_DOES_NOT_EXIST)
                 .build()
             )
         )

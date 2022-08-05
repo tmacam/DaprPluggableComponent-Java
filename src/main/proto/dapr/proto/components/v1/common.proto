@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package dapr.proto.components.v1;
+
+option go_package = "github.com/dapr/dapr/pkg/proto/components/v1;components";
+
+
+message MetadataRequest {
+  map<string, string> properties = 1;
+}
+
+message FeaturesResponse {
+  repeated string feature = 1;
+}

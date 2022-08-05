@@ -52,6 +52,29 @@ protobuf {
     }
 }
 
+// IntelliJ aparently knows how to figure out the whole source thing but
+// VS code was having a hard time finding gRPC-related java generated 
+// source files. Explicitely setting source seems do do the trick.
+// https://stackoverflow.com/questions/72440517/
+
+sourceSets {
+    main {
+        java {
+            srcDir 'src/main/java'
+            srcDir "${protobuf.generatedFilesBaseDir}/main/java"
+            srcDir "${protobuf.generatedFilesBaseDir}/main/grpc"
+        }
+
+        proto {
+            srcDir "${rootProject.projectDir}/proto"
+        }
+
+        resources {
+            srcDir 'src/main/resources'
+        }
+    }
+}
+
 test {
     useJUnitPlatform()
 }

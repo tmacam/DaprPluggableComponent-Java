@@ -6,6 +6,8 @@ plugins {
     id 'idea'
 
     id "io.freefair.lombok" version "6.5.0.3"
+
+    id 'application'
 }
 
 group 'org.example'
@@ -21,19 +23,30 @@ def grpcVersion = '1.48.0' // CURRENT_GRPC_VERSION
 def protobufVersion = '3.21.1'
 def protocVersion = protobufVersion
 
+
 dependencies {
     implementation 'io.dapr:dapr-sdk:1.6.0'
+
+    // GRPC
     implementation "io.grpc:grpc-protobuf:${grpcVersion}"
     implementation "io.grpc:grpc-stub:${grpcVersion}"
-    implementation 'org.projectlombok:lombok:1.18.24'
+
+    // gRPC - Netty for using UnixDomainSockets
+    implementation "io.grpc:grpc-netty:${grpcVersion}"
+    runtimeOnly "io.grpc:grpc-netty-shaded:${grpcVersion}"
+    // grpc-grpc-java: How to connect to unix socket? - https://github.com/grpc/grpc-java/issues/1539
+    implementation 'io.netty:netty-transport-native-epoll:4.1.79.Final:linux-x86_64'
+    implementation 'io.netty:netty-transport-native-kqueue:4.1.79.Final:osx-x86_64'
 
     compileOnly "org.apache.tomcat:annotations-api:6.0.53"
+
+    // Life is too short to parse command line arguments
+    implementation 'com.beust:jcommander:1.82'
 
 
     // examples/advanced need this for JsonFormat
     implementation "com.google.protobuf:protobuf-java-util:${protobufVersion}"
 
-    runtimeOnly "io.grpc:grpc-netty-shaded:${grpcVersion}"
 
     testImplementation "io.grpc:grpc-testing:${grpcVersion}"
 
@@ -52,9 +65,9 @@ protobuf {
     }
 }
 
-// IntelliJ aparently knows how to figure out the whole source thing but
+// IntelliJ apparently knows how to figure out the whole source thing but
 // VS code was having a hard time finding gRPC-related java generated 
-// source files. Explicitely setting source seems do do the trick.
+// source files. Explicitly setting source seems do do the trick.
 // https://stackoverflow.com/questions/72440517/
 
 sourceSets {
@@ -75,6 +88,25 @@ sourceSets {
     }
 }
 
+// adds `run` target
+application {
+    mainClass = 'org.example.StateStoreComponentServer'
+}
+
 test {
     useJUnitPlatform()
+}
+
+startScripts.enabled = false
+
+task stateStoreComponentServerApplication(type: CreateStartScripts) {
+    mainClass = 'org.example.StateStoreComponentServer'
+    applicationName = 'state-store-component-server'
+    outputDir = new File(project.buildDir, 'tmp2/scripts/' + name)
+    classpath = startScripts.classpath
+}
+
+applicationDistribution.into('bin') {
+    from(stateStoreComponentServerApplication)
+    fileMode = 0755
 }

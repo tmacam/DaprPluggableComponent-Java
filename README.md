@@ -2,7 +2,9 @@
 
 Sample code for a [Dapr] Pluggable Component implementation in Java.
 
-For further information on Pluggable Component, check https://github.com/johnewart/dapr/blob/pluggable-components-v2/docs/PLUGGABLE_COMPONENTS.md
+For further information on Pluggable Components, check:
+*  [(Proposal) (Updated) gRPC Components (aka "Pluggable components") · Issue #4925](https://github.com/dapr/dapr/issues/4925)
+*  https://github.com/johnewart/dapr/blob/pluggable-components-v2/docs/PLUGGABLE_COMPONENTS.md
 
 ## Compiling and running the code
 

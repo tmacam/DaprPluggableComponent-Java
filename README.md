@@ -32,4 +32,12 @@ The intended way to use this application is setting an environment variable  `AP
 APR_COMPONENT_SOCKET_PATH=/tmp/unix.sock ./build/install/DaprPluggableComponent-Java/bin/state-store-component-server
 ```
 
+## Running as a Docker image
+
+```
+docker build -t javacomponent .
+docker run javacomponent
+```
+
+
 [Dapr]: https://dapr.io

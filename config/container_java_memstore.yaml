@@ -1,0 +1,16 @@
+apiVersion: dapr.io/v1alpha1
+kind: PluggableComponent
+metadata:
+  name: javamemstore
+spec:
+  type: state
+  version: v1
+  socket: /tmp/sharedUDS/javaMemstore.socket
+---
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: myjavamemstore
+spec:
+  type: state.javamemstore
+  version: v1

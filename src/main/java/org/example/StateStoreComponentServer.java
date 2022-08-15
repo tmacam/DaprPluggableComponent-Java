@@ -79,6 +79,8 @@ public class StateStoreComponentServer {
           "Removing it to recreate it.");
       Files.deleteIfExists(unixSocketFile.toPath());
     }
+    // Regardless, delete this file on exist. Just good hygiene ;)
+    unixSocketFile.deleteOnExit();
 
     final DomainSocketAddress unixSocket = new DomainSocketAddress(unixSocketPath);
     final EpollEventLoopGroup group = new EpollEventLoopGroup();

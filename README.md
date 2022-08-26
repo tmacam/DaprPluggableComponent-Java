@@ -44,6 +44,21 @@ mkdir -pv  /tmp/sharedUDS
 docker run -e DAPR_COMPONENT_SOCKET_PATH=/tmp/sharedUDS/javaMemstore.socket -v /tmp/sharedUDS/:/tmp/sharedUDS/ javacomponent
 ```
 
+> ⚠️ Remember, you need to start your component **before** you start `daprd`.
+
+## Running using docker-compose
+
+Running using `docker-compose` allows to quickly test the whole solution with no compilation required. It also portraits how one must orchestrate the start of pluggable components and `daprd` itself.
+
+In the current directory run:
+
+```bash
+docker-compose up
+```
+
+If you rather have this ran in detached mode, add  `-d` parameter at the end of that command. 
+
+You can run the commands from the testing section bellow after starting running `docker-compose`.
 
 ## Testing
 

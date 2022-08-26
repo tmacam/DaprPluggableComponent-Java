@@ -5,7 +5,6 @@ metadata:
 spec:
   type: state
   version: v1
-  socket: /tmp/sharedUDS/javaMemstore.socket
 ---
 apiVersion: dapr.io/v1alpha1
 kind: Component

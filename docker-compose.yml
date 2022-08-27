@@ -7,13 +7,8 @@ services:
         volumes:
             - socket:/var/run
     daprd:
-        image: "ghcr.io/tmacam/dapr/dapr:1.9.0-pluggable-components-alpha.1-linux-amd64"
-        environment: 
-            # This is only needed for wait_for_socket_file.sh to work
-            - DAPR_COMPONENT_SOCKET_PATH=/var/run/dapr-state.javamemstore-v1-myjavamemstore.sock
-        # We need to make sure that the component service is up and running and that
-        # it created the socket file before we start daprd. Hence we preceed it with wait_for_socket_file.sh
-        command: "/extraBin/wait_for_socket_file.sh ./daprd --app-id pluggable-test --components-path=/components"
+        image: "ghcr.io/mcandeia/dapr/daprd:1.9.0-pluggable-components-alpha.5-linux-amd64"
+        command: "./daprd --app-id pluggable-test --components-path=/components"
         depends_on:
             - component
         ports:
@@ -21,6 +16,5 @@ services:
         volumes:
             - socket:/var/run
             - ./config:/components
-            - ./bin:/extraBin
 volumes:
     socket:

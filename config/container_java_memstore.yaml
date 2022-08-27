@@ -13,3 +13,4 @@ metadata:
 spec:
   type: state.javamemstore
   version: v1
+  initTimeout: 1m

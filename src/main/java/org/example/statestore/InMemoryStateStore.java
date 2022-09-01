@@ -5,11 +5,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import io.dapr.components.StateStore;
+import io.dapr.components.StateStoreValue;
 import lombok.NonNull;
 import lombok.extern.java.Log;
 
 @Log
-public class InMemoryStateStore implements StateStore{
+public class InMemoryStateStore implements StateStore {
 
   private Map<String, StateStoreValue> entries = new HashMap<>();
 

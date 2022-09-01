@@ -1,9 +1,9 @@
-package org.example.statestore;
+package io.dapr.components.impl;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.Empty;
-import dapr.proto.components.v1.Common.FeaturesResponse;
-import dapr.proto.components.v1.Common.MetadataRequest;
+import io.dapr.v1.ComponentProtos.FeaturesResponse;
+import io.dapr.v1.ComponentProtos.MetadataRequest;
 import dapr.proto.components.v1.State.BulkDeleteRequest;
 import dapr.proto.components.v1.State.BulkGetRequest;
 import dapr.proto.components.v1.State.BulkGetResponse;
@@ -14,6 +14,8 @@ import dapr.proto.components.v1.State.GetRequest;
 import dapr.proto.components.v1.State.GetResponse;
 import dapr.proto.components.v1.State.SetRequest;
 import dapr.proto.components.v1.StateStoreGrpc;
+import io.dapr.components.StateStore;
+import io.dapr.components.StateStoreValue;
 import io.dapr.v1.CommonProtos.Etag;
 import io.grpc.stub.StreamObserver;
 import java.util.List;

@@ -1,4 +1,4 @@
-package org.example.statestore;
+package io.dapr.components;
 
 import lombok.Builder;
 import lombok.NonNull;

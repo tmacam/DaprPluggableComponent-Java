@@ -20,38 +20,22 @@ import "dapr/proto/components/v1/shared.proto";
 
 option go_package = "github.com/dapr/dapr/pkg/proto/components/v1;components";
 
-// Interface for input bindings
-service InputBinding {
+// Store service provides a gRPC interface for secret store components.
+service NameResolution {
   rpc Init(MetadataRequest) returns (google.protobuf.Empty) {}
 
-  rpc Read(google.protobuf.Empty) returns (stream ReadResponse) {}
+  rpc ResolveID(ResolveRequest) returns (ResolveResponse) {}
 
-  rpc Ping(google.protobuf.Empty) returns (google.protobuf.Empty) {}
 }
 
-service OutputBinding {
-  rpc Init(MetadataRequest) returns (google.protobuf.Empty) {}
-
-  rpc Invoke(InvokeRequest) returns (InvokeResponse) {}
-
-  rpc Ping(google.protobuf.Empty) returns (google.protobuf.Empty) {}
+message ResolveRequest {
+  string id = 1;
+  string namespace = 2; 
+  int32 port = 3; 
+  map<string, string> data = 4;
 }
 
-message ReadResponse {
-  bytes data = 1;
-  map<string, string> metadata = 2;
-  string contenttype = 3; 
-}
-
-message InvokeRequest {
-  bytes data = 1;
-  map<string, string> metadata = 2;
-  string operation = 3; 
-}
-
-message InvokeResponse {
-  bytes data = 1;
-  map<string, string> metadata = 2;
-  string contenttype = 3; 
+message ResolveResponse {
+  string answer = 1;
 }
 

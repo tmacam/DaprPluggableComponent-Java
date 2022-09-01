@@ -18,7 +18,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.example.cli.CommandLineOptions;
 import org.example.statestore.InMemoryStateStore;
-import org.example.statestore.StateStoreGrpcComponentImpl;
+import io.dapr.components.impl.StateStoreGrpcComponentImpl;
 
 /**
  * A bare-bones server exposing a StateStore GRPC implementation.

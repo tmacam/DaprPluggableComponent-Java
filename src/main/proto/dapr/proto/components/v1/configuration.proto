@@ -20,38 +20,44 @@ import "dapr/proto/components/v1/shared.proto";
 
 option go_package = "github.com/dapr/dapr/pkg/proto/components/v1;components";
 
-// Interface for input bindings
-service InputBinding {
+// Store service provides a gRPC interface for secret store components.
+service ConfigurationService {
   rpc Init(MetadataRequest) returns (google.protobuf.Empty) {}
 
-  rpc Read(google.protobuf.Empty) returns (stream ReadResponse) {}
+  rpc Get(GetConfigurationRequest) returns (GetConfigurationResponse) {}
 
-  rpc Ping(google.protobuf.Empty) returns (google.protobuf.Empty) {}
+  rpc Subscribe(ConfigurationSubscribeRequest) returns (stream ConfigurationUpdateEvent) {} 
+
+  rpc Unsubscribe(ConfigurationUnsubscribeRequest) returns (google.protobuf.Empty) {}
+
 }
 
-service OutputBinding {
-  rpc Init(MetadataRequest) returns (google.protobuf.Empty) {}
-
-  rpc Invoke(InvokeRequest) returns (InvokeResponse) {}
-
-  rpc Ping(google.protobuf.Empty) returns (google.protobuf.Empty) {}
+message GetConfigurationRequest {
+  repeated string keys = 1; 
+  map<string, string> metadata = 2; 
 }
 
-message ReadResponse {
-  bytes data = 1;
-  map<string, string> metadata = 2;
-  string contenttype = 3; 
+message GetConfigurationResponse {
+  repeated Item items = 1; 
 }
 
-message InvokeRequest {
-  bytes data = 1;
-  map<string, string> metadata = 2;
-  string operation = 3; 
+message ConfigurationSubscribeRequest {
+    repeated string keys = 1; 
+    map<string, string> metadata = 2; 
 }
 
-message InvokeResponse {
-  bytes data = 1;
-  map<string, string> metadata = 2;
-  string contenttype = 3; 
+message ConfigurationUnsubscribeRequest {
+  string id = 1; 
 }
 
+message Item {
+   string key = 1; 
+   string value = 2; 
+   string version = 3; 
+   map<string, string> metadata = 4;
+}
+
+message ConfigurationUpdateEvent {
+  string id = 1; 
+  repeated Item items = 2; 
+ }

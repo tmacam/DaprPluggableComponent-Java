@@ -1,4 +1,4 @@
-package io.dapr.components.impl;
+package io.dapr.components.wrappers;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.Empty;
@@ -30,7 +30,7 @@ import org.jetbrains.annotations.NotNull;
  */
 @RequiredArgsConstructor
 @Log
-public class StateStoreGrpcComponentImpl extends StateStoreGrpc.StateStoreImplBase {
+public class StateStoreGrpcComponentWrapper extends StateStoreGrpc.StateStoreImplBase {
 
   private static final Etag EMPTY_ETAG = Etag.newBuilder().setValue("").build();
   static final GetResponse EMPTY_GET_RESPONSE = GetResponse.newBuilder()

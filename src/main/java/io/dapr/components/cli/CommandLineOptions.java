@@ -1,4 +1,4 @@
-package org.example.cli;
+package io.dapr.components.cli;
 
 import com.beust.jcommander.Parameter;
 import java.util.Optional;

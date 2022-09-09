@@ -7,7 +7,7 @@ services:
         volumes:
             - socket:/var/run
     daprd:
-        image: "ghcr.io/mcandeia/daprd:1.9.0-pluggable-components-alpha-linux-amd64"
+        image: "ghcr.io/mcandeia/daprd:1.9.0-pluggable-components-alpha.4-linux-amd64"
         command: "./daprd --app-id pluggable-test --components-path=/components"
         depends_on:
             - component

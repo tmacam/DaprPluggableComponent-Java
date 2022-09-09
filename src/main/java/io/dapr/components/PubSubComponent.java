@@ -2,28 +2,27 @@ package io.dapr.components;
 
 import io.dapr.components.aspects.AdvertisesFeatures;
 import io.dapr.components.aspects.InitializableWithProperties;
+import io.dapr.components.aspects.Pingable;
+import lombok.Builder;
 import lombok.NonNull;
 import lombok.Value;
 
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 
-public interface PubSubComponent extends InitializableWithProperties, AdvertisesFeatures {
+public interface PubSubComponent extends InitializableWithProperties, AdvertisesFeatures, Pingable {
 
-    void publish(byte[] data,
-                 @NonNull String pubSubName,
-                 @NonNull String topic,
-                 @NonNull Map<String, String> metadata,
-                 @NonNull String contentType);
+    void publish(@NonNull PubSubMessage message);
 
     // returns (stream NewMessage) {}
-    BlockingQueue<NewMessage> subscribe(@NonNull String topic,
-                                        @NonNull Map<String, String> metadata);
+    BlockingQueue<PubSubMessage> subscribe(@NonNull String topic,
+                                           @NonNull Map<String, String> metadata);
 
     @Value
-    class NewMessage {
-        byte[] data;
+    @Builder
+    class PubSubMessage {
         @NonNull String topic;
+        byte[] data;
         @NonNull Map<String, String> metadata;
         @NonNull String contentType;
     }

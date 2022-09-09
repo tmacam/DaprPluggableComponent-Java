@@ -106,7 +106,15 @@ task stateStoreComponentServerApplication(type: CreateStartScripts) {
     classpath = startScripts.classpath
 }
 
+task pubSubComponentServerApplication(type: CreateStartScripts) {
+    mainClass = 'org.example.PubSubComponentServer'
+    applicationName = 'pub-sub-component-server'
+    outputDir = new File(project.buildDir, 'tmp2/scripts/' + name)
+    classpath = startScripts.classpath
+}
+
 applicationDistribution.into('bin') {
     from(stateStoreComponentServerApplication)
+    from(pubSubComponentServerApplication)
     fileMode = 0755
 }

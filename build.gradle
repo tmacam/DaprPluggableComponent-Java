@@ -90,7 +90,13 @@ sourceSets {
     }
 }
 
+
+//
+// Checkstyle configuration and targets
+//
+
 checkstyle {
+    // we should probably anchor toolVersion
     configFile rootProject.file('checkstyle.xml')
     configDirectory.set( rootProject.getProjectDir() )
     showViolations true
@@ -106,6 +112,17 @@ checkstyleMain {
 checkstyleTest {
     source = 'src/test/java'
 }
+
+// define a target to ease invoking checkstyle verification from the command line.
+task checkstyle(dependsOn:['checkstyleMain', 'checkstyleTest']){
+    description 'Runs Checkstyle inspection on main and test sourcesets.'
+    group = 'Code Quality'
+}
+
+
+//
+// Configuration and specific targets to generate CLI applications
+//
 
 // adds `run` target
 application {

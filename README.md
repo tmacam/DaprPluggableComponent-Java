@@ -34,14 +34,15 @@ The code under `src/main/java/org/example/` exemplifies how one can
 
    Once a component is defined, we wrap them with the necessary code to
    turn them into servers ready to take requests from Dapr. You can take a 
-   look on [StateStoreComponentServer.java] for an example of how we wrap
-   [InMemoryStateStore.java] into a server ready to handle requests from Dapr.
+   look on [StateStoreComponentServer.java] for an example of how we did that
+   for [InMemoryStateStore.java].
 
     We also took care of all the tedious work for step 2 by defining a wrapper
     that handles all the tedious work of handling command line parsing,
     setting up a server listening on a Unix Socket Domain etc.
 
-
+TODO: talk about service discovery and how we tie a running component server to
+a component configuration as `config/container_java_memstore.yaml`.
 
 # Compiling and running the code
 

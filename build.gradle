@@ -8,6 +8,8 @@ plugins {
     id "io.freefair.lombok" version "6.5.0.3"
 
     id 'application'
+
+    id 'checkstyle'
 }
 
 group 'org.example'
@@ -86,6 +88,23 @@ sourceSets {
             srcDir 'src/main/resources'
         }
     }
+}
+
+checkstyle {
+    configFile rootProject.file('checkstyle.xml')
+    configDirectory.set( rootProject.getProjectDir() )
+    showViolations true
+    // Fail on checkstyle errors
+    ignoreFailures = false
+    maxWarnings = 0
+}
+
+checkstyleMain {
+    source = 'src/main/java'
+}
+
+checkstyleTest {
+    source = 'src/test/java'
 }
 
 // adds `run` target

@@ -22,13 +22,13 @@ The code under `src/main/java/org/example/` exemplifies how one can
 
 1. Define new pluggable components.
 
-    In that directory, check [InMemoryStateStore.java] for an example
-    of a simple StateStore component that stores all its data in memory.
+   In that directory, check [InMemoryStateStore.java] for an example
+   of a simple StateStore component that stores all its data in memory.
 
-    As a pluggable component developer, most if not all of your work will be
-    spent on this step. We defined Java-like interfaces so you don't have to worry
-    about the tedious work of translating gRPC classes and model to and
-    from Java.
+   As a pluggable component developer, most if not all of your work will be
+   spent on this step. We defined Java-like interfaces so you don't have to worry
+   about the tedious work of translating gRPC classes and model to and
+   from Java.
 
 2. Turn them into servers capable extending Dapr functionality.
 
@@ -37,9 +37,9 @@ The code under `src/main/java/org/example/` exemplifies how one can
    look on [StateStoreComponentServer.java] for an example of how we did that
    for [InMemoryStateStore.java].
 
-    We also took care of all the tedious work for step 2 by defining a wrapper
-    that handles all the tedious work of handling command line parsing,
-    setting up a server listening on a Unix Socket Domain etc.
+   We also took care of all the tedious work for step 2 by defining a wrapper
+   that handles all the tedious work of handling command line parsing,
+   setting up a server listening on a Unix Socket Domain etc.
 
 TODO: talk about service discovery and how we tie a running component server to
 a component configuration as `config/container_java_memstore.yaml`.

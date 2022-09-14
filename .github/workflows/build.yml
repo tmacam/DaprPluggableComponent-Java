@@ -4,21 +4,16 @@ on:
   push:
     branches:
       - master
+      - main
       - release-*
-    tags:
-      - v*
-
   pull_request:
-    branches:
-      - master
-      - release-*
 
 jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        java: [ 11, 13, 15, 16 ]
+        java: [ 11 ]
     env:
       GOVER: 1.19
       GOOS: linux
@@ -42,10 +37,10 @@ jobs:
       - name: Clean up files
         run: ./gradlew clean
       - name: Run checkstyle
-        run: ./gradlew build
+        run: ./gradlew checkstyle
       - name: Run build with Gradle Wrapper
         run: ./gradlew build
-      - name: Run build with Gradle Wrapper
+      - name: Check creation of command line executables and artifacts
         run: ./gradlew installDist
       - name: Codecov
         uses: codecov/codecov-action@v3.1.0

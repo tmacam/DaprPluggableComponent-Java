@@ -6,7 +6,7 @@ FROM eclipse-temurin:11 as build
 
 # This is a build image - no need to update anything, just build.
 RUN apt-get update && \
-    apt-get upgrade && \
+    apt-get upgrade --yes && \
     apt-get install --yes tzdata wget unzip bash
 
 ## protoc and gRPC helper binaries included with GRPC and ProtoBuf Gradle plugins

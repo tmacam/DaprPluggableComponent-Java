@@ -19,15 +19,13 @@ import io.grpc.netty.NettyServerBuilder;
 import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.epoll.EpollServerDomainSocketChannel;
 import io.netty.channel.unix.DomainSocketAddress;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 
 /**
  * Wraps a GRPC service exposing a Dapr pluggable component into a fully functional executable.
@@ -40,23 +38,27 @@ import java.util.concurrent.TimeUnit;
  *
  * <p>If you end up needing to extend functionality of this class it might be simpler re-implementing it.
  */
-@Log
-@RequiredArgsConstructor
 public class PluggableComponentServer {
   public static final String DAPR_SOCKET_PATH_ENVIRONMENT_VARIABLE = "DAPR_COMPONENT_SOCKET_PATH";
+  private static final Logger log = Logger.getLogger(PluggableComponentServer.class.getName());
 
   /**
    * Nane of the current CLI program. This will be used for constructing our --help messages.
    */
-  @NonNull private String programName;
+  private final String programName;
 
   /**
    * GRPC service for the Dapr component you want to have exposed.
    */
-  @NonNull final BindableService exposedService;
+  final BindableService exposedService;
 
   // Initialized by run, which is the only public method in this class.
   private Server server;
+
+  public PluggableComponentServer(String programName, BindableService exposedService) {
+    this.programName = programName;
+    this.exposedService = exposedService;
+  }
 
   /** Setups the machinery and wrappers to expose your service as a server.
    *
@@ -74,7 +76,7 @@ public class PluggableComponentServer {
    * @throws IOException Thrown if an error happened while running the service.
    * @throws InterruptedException Thrown if an error happened while running the service.
    */
-  public void main(@NonNull final String[] args) throws IOException, InterruptedException {
+  public void main(final String[] args) throws IOException, InterruptedException {
     // Environment variable "parsing"
     final Optional<String> maybeUnixSocketPath = Optional.ofNullable(
         System.getenv(DAPR_SOCKET_PATH_ENVIRONMENT_VARIABLE));
@@ -91,8 +93,8 @@ public class PluggableComponentServer {
   }
 
   private static Server buildUnixSocketServer(
-      @NonNull final String unixSocketPath,
-      @NonNull final BindableService exposedService) throws IOException {
+      final String unixSocketPath,
+      final BindableService exposedService) throws IOException {
     log.info("Configuring server to listen to unix socket domain on file " + unixSocketPath);
     // If file exists, remove it.
     final File unixSocketFile = new File(unixSocketPath);
@@ -140,6 +142,4 @@ public class PluggableComponentServer {
   private void blockUntilShutdown() throws InterruptedException {
     server.awaitTermination();
   }
-
-
 }

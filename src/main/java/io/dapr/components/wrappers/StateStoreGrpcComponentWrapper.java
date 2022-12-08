@@ -31,24 +31,24 @@ import io.dapr.v1.CommonProtos.Etag;
 import io.dapr.v1.ComponentProtos.FeaturesResponse;
 import io.dapr.v1.ComponentProtos.MetadataRequest;
 import io.grpc.stub.StreamObserver;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
  * A translation layer between a (local) StateStore implementation and Dapr's gRPC StateStore model.
  */
-@RequiredArgsConstructor
-@Log
 public class StateStoreGrpcComponentWrapper extends StateStoreGrpc.StateStoreImplBase {
 
   private static final Etag EMPTY_ETAG = Etag.newBuilder().setValue("").build();
   static final GetResponse EMPTY_GET_RESPONSE =
       GetResponse.newBuilder().setData(ByteString.EMPTY).setEtag(EMPTY_ETAG).build();
+  private static final Logger log = Logger.getLogger(StateStoreGrpcComponentWrapper.class.getName());
+
+  public StateStoreGrpcComponentWrapper(StateStore stateStore) {
+    this.stateStore = stateStore;
+  }
 
   static class BulkGetError {
     public static final String KEY_DOES_NOT_EXIST = "KeyDoesNotExist";
@@ -58,47 +58,46 @@ public class StateStoreGrpcComponentWrapper extends StateStoreGrpc.StateStoreImp
   /**
    * The state store that this component will expose as a service.
    */
-  @NonNull
   private final StateStore stateStore;
 
   @Override
-  public void init(@NonNull final MetadataRequest request, @NonNull final StreamObserver<Empty> responseObserver) {
+  public void init(final MetadataRequest request, final StreamObserver<Empty> responseObserver) {
     stateStore.init(request.getPropertiesMap());
     returnEmptyResponse(responseObserver);
   }
 
   @Override
-  public void features(@NonNull final Empty request, @NonNull final StreamObserver<FeaturesResponse> responseObserver) {
+  public void features(final Empty request, final StreamObserver<FeaturesResponse> responseObserver) {
     final FeaturesResponse response = FeaturesResponse.newBuilder().addAllFeature(stateStore.getFeatures()).build();
     responseObserver.onNext(response);
     responseObserver.onCompleted();
   }
 
   @Override
-  public void delete(@NonNull final DeleteRequest request, @NonNull final StreamObserver<Empty> responseObserver) {
+  public void delete(final DeleteRequest request, final StreamObserver<Empty> responseObserver) {
     singleItemDelete(request);
     returnEmptyResponse(responseObserver);
   }
 
   @Override
-  public void bulkDelete(@NonNull final BulkDeleteRequest request,
-                         @NonNull final StreamObserver<Empty> responseObserver) {
+  public void bulkDelete(final BulkDeleteRequest request,
+                         final StreamObserver<Empty> responseObserver) {
     request.getItemsList().forEach(this::singleItemDelete);
     returnEmptyResponse(responseObserver);
   }
 
-  private void singleItemDelete(@NotNull DeleteRequest request) {
+  private void singleItemDelete(DeleteRequest request) {
     stateStore.delete(request.getKey(), request.getEtag().getValue());
   }
 
   @Override
-  public void get(@NonNull final GetRequest request, @NonNull final StreamObserver<GetResponse> responseObserver) {
+  public void get(final GetRequest request, final StreamObserver<GetResponse> responseObserver) {
     final String key = request.getKey();
 
     final GetResponse response = stateStore.get(key)
         // If value is present, map it to an appropriate GetResponse object
-        .map(value -> GetResponse.newBuilder().setData(ByteString.copyFrom(value.getData()))
-            .setEtag(Etag.newBuilder().setValue(value.getEtag()).build()).build())
+        .map(value -> GetResponse.newBuilder().setData(ByteString.copyFrom(value.data()))
+            .setEtag(Etag.newBuilder().setValue(value.etag()).build()).build())
         // otherwise return an empty response
         .orElse(EMPTY_GET_RESPONSE);
 
@@ -107,19 +106,20 @@ public class StateStoreGrpcComponentWrapper extends StateStoreGrpc.StateStoreImp
   }
 
   @Override
-  public void bulkGet(@NonNull final BulkGetRequest request,
-                      @NonNull final StreamObserver<BulkGetResponse> responseObserver) {
+  public void bulkGet(final BulkGetRequest request,
+                      final StreamObserver<BulkGetResponse> responseObserver) {
     final List<BulkStateItem> items = request.getItemsList().stream()
         // Let's convert all requested items into BulkStateItems objects.
         .map(requestedItem -> stateStore.get(requestedItem.getKey())
             // If value is present, convert it to an appropriate BulkStateItem object
             .map(value -> BulkStateItem.newBuilder().setKey(requestedItem.getKey())
-                .setData(ByteString.copyFrom(value.getData()))
-                .setEtag(Etag.newBuilder().setValue(value.getEtag()).build()).setError(BulkGetError.NONE).build())
+                .setData(ByteString.copyFrom(value.data()))
+                .setEtag(Etag.newBuilder().setValue(value.etag()).build()).setError(BulkGetError.NONE).build())
             // otherwise return an empty BulkStateItem with corresponding error codes
             .orElse(
                 BulkStateItem.newBuilder().setKey(requestedItem.getKey()).setData(ByteString.EMPTY).setEtag(EMPTY_ETAG)
-                    .setError(BulkGetError.KEY_DOES_NOT_EXIST).build())).collect(Collectors.toUnmodifiableList());
+                    .setError(BulkGetError.KEY_DOES_NOT_EXIST).build()))
+        .toList();
 
     final BulkGetResponse response = BulkGetResponse.newBuilder().addAllItems(items).build();
     responseObserver.onNext(response);
@@ -127,30 +127,29 @@ public class StateStoreGrpcComponentWrapper extends StateStoreGrpc.StateStoreImp
   }
 
   @Override
-  public void set(@NonNull final SetRequest request, @NonNull final StreamObserver<Empty> responseObserver) {
+  public void set(final SetRequest request, final StreamObserver<Empty> responseObserver) {
     singleItemSet(request);
     returnEmptyResponse(responseObserver);
   }
 
   @Override
-  public void bulkSet(@NonNull final BulkSetRequest request, @NonNull final StreamObserver<Empty> responseObserver) {
+  public void bulkSet(final BulkSetRequest request, final StreamObserver<Empty> responseObserver) {
     request.getItemsList().forEach(this::singleItemSet);
     returnEmptyResponse(responseObserver);
   }
 
-  private void singleItemSet(@NotNull final SetRequest request) {
-    final StateStoreValue value =
-        StateStoreValue.builder().data(request.getValue().toByteArray()).etag(request.getEtag().getValue()).build();
+  private void singleItemSet(final SetRequest request) {
+    final StateStoreValue value = new StateStoreValue(request.getValue().toByteArray(), request.getEtag().getValue());
     stateStore.set(request.getKey(), value);
   }
 
   @Override
-  public void ping(@NonNull final Empty request, @NonNull final StreamObserver<Empty> responseObserver) {
+  public void ping(final Empty request, final StreamObserver<Empty> responseObserver) {
     log.info("Ping invoked.");
     returnEmptyResponse(responseObserver);
   }
 
-  private static void returnEmptyResponse(@NonNull final StreamObserver<Empty> responseObserver) {
+  private static void returnEmptyResponse(final StreamObserver<Empty> responseObserver) {
     responseObserver.onNext(Empty.getDefaultInstance());
     responseObserver.onCompleted();
   }

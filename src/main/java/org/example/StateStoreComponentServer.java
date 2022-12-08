@@ -16,8 +16,6 @@ package org.example;
 import io.dapr.components.cli.PluggableComponentServer;
 import io.dapr.components.wrappers.StateStoreGrpcComponentWrapper;
 import io.grpc.BindableService;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
 import org.example.statestore.InMemoryStateStore;
 
 import java.io.IOException;
@@ -25,8 +23,6 @@ import java.io.IOException;
 /**
  * A bare-bones server exposing a StateStore GRPC implementation.
  */
-@Log
-@RequiredArgsConstructor
 public class StateStoreComponentServer {
 
   /** Start our StateStoreComponentServer.

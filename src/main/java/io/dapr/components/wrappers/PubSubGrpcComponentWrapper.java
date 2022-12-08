@@ -20,18 +20,19 @@ import dapr.proto.components.v1.Pubsub;
 import io.dapr.components.PubSubComponent;
 import io.dapr.v1.ComponentProtos;
 import io.grpc.stub.StreamObserver;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
 
 import java.util.concurrent.BlockingQueue;
+import java.util.logging.Logger;
 
-@RequiredArgsConstructor
-@Log
 public final class PubSubGrpcComponentWrapper extends PubSubGrpc.PubSubImplBase {
 
-  @NonNull
+  private static final Logger log = Logger.getLogger(PubSubGrpcComponentWrapper.class.getName());
+
   private final PubSubComponent pubSub;
+
+  public PubSubGrpcComponentWrapper(PubSubComponent pubSub) {
+    this.pubSub = pubSub;
+  }
 
   @Override
   public void init(ComponentProtos.MetadataRequest request, StreamObserver<Empty> responseObserver) {
@@ -49,8 +50,8 @@ public final class PubSubGrpcComponentWrapper extends PubSubGrpc.PubSubImplBase 
   }
 
   @Override
-  public void publish(@NonNull Pubsub.PublishRequest request,
-                      @NonNull StreamObserver<Empty> responseObserver) {
+  public void publish(Pubsub.PublishRequest request,
+                      StreamObserver<Empty> responseObserver) {
     final PubSubComponent.PubSubMessage message = fromGrpcType(request);
     pubSub.publish(message);
     returnEmptyResponse(responseObserver);
@@ -75,26 +76,25 @@ public final class PubSubGrpcComponentWrapper extends PubSubGrpc.PubSubImplBase 
     responseObserver.onCompleted();
   }
 
-  private static void returnEmptyResponse(@NonNull final StreamObserver<Empty> responseObserver) {
+  private static void returnEmptyResponse(final StreamObserver<Empty> responseObserver) {
     responseObserver.onNext(Empty.getDefaultInstance());
     responseObserver.onCompleted();
   }
 
-  private static PubSubComponent.PubSubMessage fromGrpcType(@NonNull Pubsub.PublishRequest request) {
-    return PubSubComponent.PubSubMessage.builder()
-        .topic(request.getTopic())
-        .data(request.getData().toByteArray())
-        .metadata(request.getMetadataMap())
-        .contentType(request.getContenttype())
-        .build();
+  private static PubSubComponent.PubSubMessage fromGrpcType(Pubsub.PublishRequest request) {
+    return new PubSubComponent.PubSubMessage(
+        request.getTopic(),
+        request.getData().toByteArray(),
+        request.getMetadataMap(),
+        request.getContenttype());
   }
 
-  private static Pubsub.NewMessage toGrpcType(@NonNull PubSubComponent.PubSubMessage message) {
+  private static Pubsub.NewMessage toGrpcType(PubSubComponent.PubSubMessage message) {
     return Pubsub.NewMessage.newBuilder()
-        .setTopic(message.getTopic())
-        .setData(ByteString.copyFrom(message.getData()))
-        .setContenttype(message.getContentType())
-        .putAllMetadata(message.getMetadata())
+        .setTopic(message.topic())
+        .setData(ByteString.copyFrom(message.data()))
+        .setContenttype(message.contentType())
+        .putAllMetadata(message.metadata())
         .build();
   }
 }

@@ -14,9 +14,6 @@
 package org.example.pubsub;
 
 import io.dapr.components.PubSubComponent;
-import lombok.NonNull;
-import lombok.Value;
-import lombok.extern.java.Log;
 
 import java.util.Collections;
 import java.util.List;
@@ -26,14 +23,15 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.logging.Logger;
 
-@Log
 public class InMemoryPubSub implements PubSubComponent {
 
+  private static final Logger log = Logger.getLogger(InMemoryPubSub.class.getName());
   ConcurrentMap<String, SubscriberList> perTopicSubscribers = new ConcurrentHashMap<>();
 
   @Override
-  public void init(@NonNull Map<String, String> properties) {
+  public void init(Map<String, String> properties) {
     log.info("Initializing InMemoryPubSub Store.");
   }
 
@@ -48,8 +46,8 @@ public class InMemoryPubSub implements PubSubComponent {
   }
 
   @Override
-  public void publish(@NonNull final PubSubMessage message) {
-    final String topic = message.getTopic();
+  public void publish(final PubSubMessage message) {
+    final String topic = message.topic();
     getSubscribersForTopic(topic).subscribers.parallelStream().forEach(s -> {
       try {
         // the big assumption here is that we won't block while adding messages to those queues
@@ -64,7 +62,7 @@ public class InMemoryPubSub implements PubSubComponent {
   }
 
   @Override
-  public BlockingQueue<PubSubMessage> subscribe(@NonNull String topic, @NonNull Map<String, String> metadata) {
+  public BlockingQueue<PubSubMessage> subscribe(String topic, Map<String, String> metadata) {
     // This is an unbounded LinkedBlockingList.
     final BlockingQueue<PubSubMessage> subscription = new LinkedBlockingQueue<>();
     getSubscribersForTopic(topic).subscribers.add(subscription);
@@ -72,13 +70,16 @@ public class InMemoryPubSub implements PubSubComponent {
     return subscription;
   }
 
-  private SubscriberList getSubscribersForTopic(@NonNull String topic) {
+  private SubscriberList getSubscribersForTopic(String topic) {
     return perTopicSubscribers.computeIfAbsent(topic, s -> new SubscriberList());
   }
 
   // Missing a typedef-like  declaration in java ;)
-  @Value
-  public static class SubscriberList {
-    @NonNull ConcurrentLinkedQueue<BlockingQueue<PubSubMessage>> subscribers = new ConcurrentLinkedQueue<>();
+  public static final class SubscriberList {
+    private final ConcurrentLinkedQueue<BlockingQueue<PubSubMessage>> subscribers = new ConcurrentLinkedQueue<>();
+
+    public ConcurrentLinkedQueue<BlockingQueue<PubSubMessage>> getSubscribers() {
+      return this.subscribers;
+    }
   }
 }

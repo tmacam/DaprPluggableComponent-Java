@@ -28,9 +28,6 @@ public class CommandLineOptions {
       + "Takes precedence over environment variable " + DAPR_SOCKET_PATH_ENVIRONMENT_VARIABLE)
   private String unixSocketPath;
 
-  @Parameter(names = {"-t", "--tcp"}, description = "TCP port to run on. ")
-  private Integer tcpPort;
-
   @Parameter(names = "--help", help = true, description = "Print this app help or usage.")
   private boolean help;
 

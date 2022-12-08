@@ -16,7 +16,6 @@ package io.dapr.components.cli;
 import com.beust.jcommander.JCommander;
 import io.grpc.BindableService;
 import io.grpc.Server;
-import io.grpc.ServerBuilder;
 import io.grpc.netty.NettyServerBuilder;
 import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.epoll.EpollServerDomainSocketChannel;
@@ -89,19 +88,14 @@ public class PluggableComponentServer {
     }
     // Either Unix Socket Domains or TCP, but not both
     final Optional<String> maybeUnixSocketPath = options.getUnixSocketPathFromArgsOrEnv();
-    final Optional<Integer> maybeTcpPort = Optional.ofNullable(options.getTcpPort());
-    if (maybeUnixSocketPath.isPresent() == maybeTcpPort.isPresent()) {
-      System.err.println("ERROR: You must provide either a UNIX socket path or "
-          + "a TCP port - but not both.\n\n");
+    if (maybeUnixSocketPath.isEmpty()) {
+      System.err.println("ERROR: You MUST provide either UNIX socket path\n\n");
       jCommander.usage();
       System.exit(1);
     }
-    final boolean isTcpServer = maybeTcpPort.isPresent();
-
     // Start server
     log.info("Starting server for " + programName + "...");
-    server = isTcpServer ? setupTcpServer(maybeTcpPort.get(), exposedService)
-        : buildUnixSocketServer(maybeUnixSocketPath.get(), exposedService);
+    server = buildUnixSocketServer(maybeUnixSocketPath.get(), exposedService);
 
     start();
     blockUntilShutdown();
@@ -128,13 +122,6 @@ public class PluggableComponentServer {
         .channelType(EpollServerDomainSocketChannel.class)
         .workerEventLoopGroup(group)
         .bossEventLoopGroup(group)
-        .addService(exposedService)
-        .build();
-  }
-
-  private static Server setupTcpServer(int port, @NonNull final BindableService exposedService) {
-    log.info("Configuring server to listen on TCP port " + port);
-    return ServerBuilder.forPort(port)
         .addService(exposedService)
         .build();
   }

@@ -13,7 +13,6 @@
 
 package io.dapr.components.cli;
 
-import com.beust.jcommander.JCommander;
 import io.grpc.BindableService;
 import io.grpc.Server;
 import io.grpc.netty.NettyServerBuilder;
@@ -44,11 +43,12 @@ import java.util.concurrent.TimeUnit;
 @Log
 @RequiredArgsConstructor
 public class PluggableComponentServer {
+  public static final String DAPR_SOCKET_PATH_ENVIRONMENT_VARIABLE = "DAPR_COMPONENT_SOCKET_PATH";
+
   /**
    * Nane of the current CLI program. This will be used for constructing our --help messages.
    */
-  @NonNull
-  private String programName;
+  @NonNull private String programName;
 
   /**
    * GRPC service for the Dapr component you want to have exposed.
@@ -75,22 +75,11 @@ public class PluggableComponentServer {
    * @throws InterruptedException Thrown if an error happened while running the service.
    */
   public void main(@NonNull final String[] args) throws IOException, InterruptedException {
-    // Command line parsing
-    final CommandLineOptions options = new CommandLineOptions();
-    final JCommander jCommander = JCommander.newBuilder()
-        .programName(programName)
-        .addObject(options)
-        .build();
-    jCommander.parse(args);
-    if (options.isHelp()) {
-      jCommander.usage();
-      System.exit(0);
-    }
-    // Either Unix Socket Domains or TCP, but not both
-    final Optional<String> maybeUnixSocketPath = options.getUnixSocketPathFromArgsOrEnv();
+    // Environment variable "parsing"
+    final Optional<String> maybeUnixSocketPath = Optional.ofNullable(
+        System.getenv(DAPR_SOCKET_PATH_ENVIRONMENT_VARIABLE));
     if (maybeUnixSocketPath.isEmpty()) {
-      System.err.println("ERROR: You MUST provide either UNIX socket path\n\n");
-      jCommander.usage();
+      System.err.println("ERROR: environment variable " + DAPR_SOCKET_PATH_ENVIRONMENT_VARIABLE + " is not defined.");
       System.exit(1);
     }
     // Start server
@@ -151,5 +140,6 @@ public class PluggableComponentServer {
   private void blockUntilShutdown() throws InterruptedException {
     server.awaitTermination();
   }
+
 
 }

@@ -53,7 +53,7 @@
 
     <module name="RegexpHeader">
         <property name="fileExtensions" value="java"/>
-        <property name="headerFile" value="${config_loc}/.java_header"/>
+        <property name="headerFile" value=".java_header"/>
     </module>
 
     <module name="TreeWalker">

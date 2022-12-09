@@ -1,8 +1,21 @@
+# IDE generated files and directories
+*.iml
+.idea/
+.vs/
+.vscode/
+
+# Output folders
+**/target/
+
 # Compiled class file
 *.class
 
+# Proto meta
+*.pb.meta
+
 # Log file
 *.log
+/syslog.txt
 
 # BlueJ files
 *.ctxt
@@ -19,12 +32,20 @@
 *.tar.gz
 *.rar
 
+# Eclipse
+.classpath
+.project
+.settings
+
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 
-# IDE and build artifacts
-.iml
-.idea
-.gradle
-build/
-.vscode
+# Some other generated folders/files
+/docs/dapr-sdk-actors
+/docs/dapr-sdk-autogen
+/docs/dapr-sdk
+/proto/dapr
+/proto/daprclient
+
+# macOS
+.DS_Store

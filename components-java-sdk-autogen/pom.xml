@@ -27,6 +27,15 @@
         <protobuf.input.directory>src/main/protobuf/</protobuf.input.directory>
     </properties>
 
+    <dependencies>
+        <dependency>
+            <groupId>javax.annotation</groupId>
+            <artifactId>javax.annotation-api</artifactId>
+            <version>1.3.2</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
     <build>
         <plugins>
             <plugin>
@@ -44,11 +53,13 @@
                             <addProtoSources>inputs</addProtoSources>
                             <includeMavenTypes>direct</includeMavenTypes>
                             <includeStdTypes>true</includeStdTypes>
+                            <!-- This is not a typo: we have to set include and input directories -->
                             <inputDirectories>
                                 <include>${protobuf.input.directory}</include>
-                                <include>${protobuf.input.directory}/dapr/proto/common/v1</include>
-                                <include>${protobuf.input.directory}/dapr/proto/components/v1</include>
                             </inputDirectories>
+                            <includeDirectories>
+                                <include>${protobuf.input.directory}</include>
+                            </includeDirectories>
                             <outputTargets>
                                 <outputTarget>
                                     <type>java</type>

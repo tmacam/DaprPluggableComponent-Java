@@ -3,6 +3,7 @@
 .idea/
 .vs/
 .vscode/
+.gradle/
 
 # Output folders
 **/target/

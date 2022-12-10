@@ -1,24 +1,14 @@
 # https://yogin16.github.io/2018/08/30/grpc-server-dockerize/
 # https://stackoverflow.com/questions/60014845/how-to-install-oracle-jdk11-in-alpine-linux-docker-image/68459967#68459967
 
-FROM eclipse-temurin:11 as build
+FROM eclipse-temurin:17 as build
 
 
 # This is a build image - no need to update anything, just build.
 RUN apt-get update && \
     apt-get upgrade --yes && \
-    apt-get install --yes tzdata wget unzip bash
+    apt-get install --yes tzdata wget unzip bash maven
 
-## protoc and gRPC helper binaries included with GRPC and ProtoBuf Gradle plugins
-## are built against glibc. But Alpine linux uses musl - and this leads to all
-## sorts of cryptic errors while trying to build .proto and gRPC stubs.
-## The package `gcompat` adds a glibc compatibility layer that just solves the
-## problem with minimal fuss. See
-## * https://wiki.alpinelinux.org/wiki/Running_glibc_programs
-## * https://github.com/google/protobuf-gradle-plugin/issues/265
-## We also add protobuf package as there is a lib  dependency on it.
-#RUN apk add --no-cache --update gcompat protobuf \
-#    && rm -rf /var/cache/apk/*
 
 #
 # We will install things in opt. Create it already if it not there.
@@ -52,7 +42,7 @@ RUN gradle installDist
 # Build complete. Now setup only the the runtime environment
 #
 
-FROM eclipse-temurin:11-jre
+FROM eclipse-temurin:17-jre
 
 RUN mkdir -vp /opt/
 ENV PROJECT_DIR=/opt/statestore-component

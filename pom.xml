@@ -18,6 +18,7 @@
     <properties>
         <grpc.version>1.42.1</grpc.version>
         <protobuf.version>3.17.3</protobuf.version>
+        <springboot.version>2.3.5.RELEASE</springboot.version>
 
         <spotbugs.version>4.0.0-RC1</spotbugs.version>
         <spotbugs.fail>true</spotbugs.fail>

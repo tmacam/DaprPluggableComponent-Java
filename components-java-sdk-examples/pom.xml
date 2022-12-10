@@ -26,4 +26,29 @@
         </dependency>
     </dependencies>
 
+    <build>
+        <plugins>
+            <!-- There are quite a few ways to pack a java app into a self-contained JAR. -->
+            <!-- We went for Sprint Boot for consistency with Dapr Java SDK -->
+            <!-- Other options are also listed on https://www.baeldung.com/executable-jar-with-maven -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${springboot.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>org.example.StateStoreComponentServer</mainClass>
+                            <classifier>exec</classifier>
+                            <finalName>components-java-sdk-examples-statestore</finalName>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
 </project>
